@@ -4,6 +4,10 @@ from sklearn.metrics import f1_score, accuracy_score
 from collections import Counter
 
 
+#### Potentiel ajout d'une fonction de nettoyage des tweets 
+
+
+
 def load_file(pos_file,neg_file):
 
     try : 
@@ -24,25 +28,20 @@ def load_file(pos_file,neg_file):
     
 
 def build_vocabulary(tweets, min_freq=5):
-    """Construire le vocabulaire avec les mots apparaissant au moins min_freq fois"""
-    # Compter tous les mots
+ 
     word_counter = Counter()
     
     for tweet in tweets:
         words = tweet.split()
         word_counter.update(words)
     
-    # Filtrer les mots avec au moins min_freq occurrences
     vocabulary = {word for word, count in word_counter.items() if count >= min_freq}
     
     print(f"📚 Vocabulaire construit:")
     print(f"   - Mots uniques total: {len(word_counter)}")
     print(f"   - Mots avec freq >= {min_freq}: {len(vocabulary)}")
     
-    # Afficher les mots les plus fréquents
-    print(f"   - 10 mots les plus fréquents:")
-    for word, count in word_counter.most_common(10):
-        print(f"      '{word}': {count} occurrences")
+
     
     return vocabulary, word_counter
 
