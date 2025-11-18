@@ -27,9 +27,18 @@ def main():
     for epoch in range(epochs):
         print("epoch {}".format(epoch))
         for ix, jy, n in zip(cooc.row, cooc.col, cooc.data):
-            pass
-    # fill in your SGD code here,
-    # for the update resulting from co-occurence (i,j)
+        # fill in your SGD code here,
+        # for the update resulting from co-occurence (i,j)
+            x_dn = np.log(n)
+            f_dn = min(1, (n / nmax)**alpha)
+            # Retrieving x and y
+            x, y  = xs[ix, :], ys[jy, :]
+            # Computing the gradient of the loss
+            grad_loss = f_dn * (x_dn - np.dot(x,y))
+            scale = eta * grad_loss
+            # Updating the vectors
+            xs[ix, :] += scale * y
+            ys[jy, :] += scale * x
 
     np.save("embeddings", xs)
 
