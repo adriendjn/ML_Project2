@@ -1,2 +1,5 @@
-#Ignoring the dataset as it is too large for github
+# Ignoring the dataset as it is too large for github
 twitter-datasets/
+
+# Vocabulary intermediate files
+vocab_*.txt
