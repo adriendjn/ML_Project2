@@ -72,3 +72,10 @@ def tweets_to_features(tweets, vocab, embeddings):
         x.append(vec_tweet(tweet, vocab, embeddings))
     return np.array(x)
 
+def create_submission(prediction, filename):
+    with open(filename, "w") as f:
+        f.write("Id,Prediction\n")
+        for idx, pred in enumerate(prediction):
+            if pred == 1:
+                f.write(f"{idx},1\n")
+            else: f.write(f"{idx},-1\n")
