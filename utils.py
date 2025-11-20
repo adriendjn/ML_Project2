@@ -1,7 +1,6 @@
 from collections import Counter
 import numpy as np
 
-#### Potentiel ajout d'une fonction de nettoyage des tweets 
 
 def load_file(train_pos_file, train_neg_file, test_file):
     pos_tweets, neg_tweets, test_tweets = [], [], []
