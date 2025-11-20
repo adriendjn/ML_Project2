@@ -1,55 +1,41 @@
 import numpy as np
-from pathlib import Path
 from sklearn.metrics import f1_score, accuracy_score
-from collections import Counter
+from utils import load_file, load_vocab, build_vocabulary, tweets_to_features
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
 
 
-#### Potentiel ajout d'une fonction de nettoyage des tweets 
 
 
 
-def load_file(pos_file,neg_file):
-
-    try : 
-        with open(pos_file, 'r', encoding='utf-8') as f1:
-            pos_tweets = [line.strip() for line in f1 if line.strip()]
-
-    except FileNotFoundError:
-        print(f" Fichier {pos_file} non trouvé")
-        return []
-    
-    try : 
-        with open(neg_file, 'r', encoding='utf-8') as f2:
-            neg_tweets = [line.strip() for line in f2 if line.strip()]
-    except FileNotFoundError:
-        print(f" Fichier {neg_file} non trouvé")
-        return []
-    return pos_tweets, neg_tweets
-    
-
-def build_vocabulary(tweets, min_freq=5):
- 
-    word_counter = Counter()
-    
-    for tweet in tweets:
-        words = tweet.split()
-        word_counter.update(words)
-    
-    vocabulary = {word for word, count in word_counter.items() if count >= min_freq}
-    
-    print(f"📚 Vocabulaire construit:")
-    print(f"   - Mots uniques total: {len(word_counter)}")
-    print(f"   - Mots avec freq >= {min_freq}: {len(vocabulary)}")
-    
-
-    
-    return vocabulary, word_counter
-
-tweet_pos, tweet_neg = load_file("twitter-datasets/train_pos.txt","twitter-datasets/train_neg.txt")
+tweet_pos, tweet_neg, data_test = load_file("twitter-datasets/train_pos.txt","twitter-datasets/train_neg.txt", "twitter-datasets/test_data.txt")
+vocab_file = load_vocab("vocab_cut.txt")
 vocabulary_pos, word_counts_pos = build_vocabulary(tweet_pos, min_freq=5)
 vocabulary_neg, word_counts_neg = build_vocabulary(tweet_neg, min_freq=5)
+data = np.load("embeddings.npy")
+list_vect_tweet_pos = tweets_to_features(tweet_pos, vocab_file, data)
+list_vect_tweet_neg = tweets_to_features(tweet_neg, vocab_file, data)
+list_vect_tweet_test = tweets_to_features(data_test, vocab_file, data)
 
+
+X_train = np.vstack([list_vect_tweet_pos, list_vect_tweet_neg])
+y_train = np.hstack([ np.ones(len(list_vect_tweet_pos)),   np.zeros(len(list_vect_tweet_neg))])
     
+X_train_full = X_train
+y_train_full = y_train
+
+X_train_split, X_val, y_train_split, y_val = train_test_split(
+    X_train_full, y_train_full, test_size=0.2, random_state=42, stratify=y_train_full
+)
     
 
 
+clf = LogisticRegression(max_iter=2000, n_jobs=-1)
+clf.fit(X_train_split, y_train_split)
+print("Training Model finish")
+y_val_pred = clf.predict(X_val)
+acc = accuracy_score(y_val, y_val_pred)
+f1 = f1_score(y_val, y_val_pred)
+
+print("Validation Accuracy:", acc)
+print("Validation F1-score:", f1)
