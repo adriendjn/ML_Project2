@@ -109,22 +109,15 @@ def build_vocabulary(tweets, min_freq=5):
     return vocabulary, word_counter
 
 def vec_tweet(tweet, vocab, embeddings):
-    words = tweet.split()
-    vecs = []
+    vecs = [embeddings[vocab[w]] for w in tweet.split() if w in vocab]
 
-    for w in words:
-        if w in vocab:
-            idx = vocab[w]
-            vecs.append(embeddings[idx])
     if vecs:
         return np.array(np.mean(vecs, axis=0))
     else: return np.array(np.zeros(embeddings.shape[1]))
     
 
 def tweets_to_features(tweets, vocab, embeddings):
-    x = []
-    for tweet in tweets:
-        x.append(vec_tweet(tweet, vocab, embeddings))
+    x = [vec_tweet(tweet, vocab, embeddings) for tweet in tweets]
     return np.array(x)
 
 def create_csv_submission(ids, y_pred, file_name):
