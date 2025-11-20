@@ -1,21 +1,23 @@
 import numpy as np
 from sklearn.metrics import f1_score, accuracy_score
-from utils import load_file, load_vocab, build_vocabulary, tweets_to_features
+from utils import load_tweets, load_vocab, build_vocabulary, tweets_to_features
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+from os import path
 
 
 
 
 
-tweet_pos, tweet_neg, data_test = load_file("twitter-datasets/train_pos.txt","twitter-datasets/train_neg.txt", "twitter-datasets/test_data.txt")
+tweet_pos, tweet_neg, data_test = load_tweets("twitter-datasets/train_pos.txt","twitter-datasets/train_neg.txt", "twitter-datasets/test_data.txt")
 vocab_file = load_vocab("vocab_cut.txt")
 vocabulary_pos, word_counts_pos = build_vocabulary(tweet_pos, min_freq=5)
 vocabulary_neg, word_counts_neg = build_vocabulary(tweet_neg, min_freq=5)
-data = np.load("embeddings.npy")
-list_vect_tweet_pos = tweets_to_features(tweet_pos, vocab_file, data)
-list_vect_tweet_neg = tweets_to_features(tweet_neg, vocab_file, data)
-list_vect_tweet_test = tweets_to_features(data_test, vocab_file, data)
+fp = path.join(path.split(__file__)[0], path.normcase("embeddings.npy"))
+embeddings = np.load(fp)
+list_vect_tweet_pos = tweets_to_features(tweet_pos, vocab_file, embeddings)
+list_vect_tweet_neg = tweets_to_features(tweet_neg, vocab_file, embeddings)
+list_vect_tweet_test = tweets_to_features(data_test, vocab_file, embeddings)
 
 
 X_train = np.vstack([list_vect_tweet_pos, list_vect_tweet_neg])
