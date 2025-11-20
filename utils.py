@@ -1,4 +1,7 @@
 from collections import Counter
+import numpy as np
+
+#### Potentiel ajout d'une fonction de nettoyage des tweets 
 
 def load_file(train_pos_file, train_neg_file, test_file):
     pos_tweets, neg_tweets, test_tweets = [], [], []
@@ -47,3 +50,14 @@ def build_vocabulary(tweets, min_freq=5):
     print(f"   - Mots uniques total: {len(word_counter)}")
     print(f"   - Mots avec freq >= {min_freq}: {len(vocabulary)}")
     return vocabulary, word_counter
+
+def vec_tweet(tweet, vocab, embeddings):
+    words = tweet.split()
+    vecs = []
+
+    for w in words:
+        if w in vocab:
+            idx = vocab[w]
+            vecs.append(embeddings[idx])
+    
+    return np.mean(vecs, axis=0)
