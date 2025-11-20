@@ -3,11 +3,12 @@ from scipy.sparse import *
 import numpy as np
 import pickle
 import random
+from os import path
 
 
 def main():
     print("loading cooccurrence matrix")
-    with open("cooc.pkl", "rb") as f:
+    with open(path.join(path.split(__file__)[0],path.normcase("cooc.pkl")), "rb") as f:
         cooc = pickle.load(f)
     print("{} nonzero entries".format(cooc.nnz))
 
@@ -22,7 +23,7 @@ def main():
     eta = 0.001
     alpha = 3 / 4
 
-    epochs = 10
+    epochs = 1
 
     for epoch in range(epochs):
         print("epoch {}".format(epoch))
@@ -39,8 +40,7 @@ def main():
             # Updating the vectors
             xs[ix, :] += scale * y
             ys[jy, :] += scale * x
-
-    np.save("embeddings", xs)
+    np.save(path.join(path.split(__file__)[0], path.normcase("embeddings.npy")), xs)
 
 
 if __name__ == "__main__":

@@ -9,3 +9,9 @@ vocab_*.txt
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Pickle serialization file
+*.pkl
+
+# NumPy serialization file
+*.npy
