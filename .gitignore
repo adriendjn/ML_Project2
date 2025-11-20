@@ -3,3 +3,9 @@ twitter-datasets/
 
 # Vocabulary intermediate files
 vocab_*.txt
+
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
