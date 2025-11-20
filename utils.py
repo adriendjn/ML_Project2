@@ -58,5 +58,13 @@ def vec_tweet(tweet, vocab, embeddings):
         if w in vocab:
             idx = vocab[w]
             vecs.append(embeddings[idx])
+    if vecs:
+        return np.array(np.mean(vecs, axis=0))
+    else: return np.array(np.zeros(embeddings.shape[1]))
     
-    return np.mean(vecs, axis=0)
+
+def tweets_to_features(tweets, vocab, embeddings):
+    x = []
+    for tweet in tweets:
+        x.append(vec_tweet(tweet, vocab, embeddings))
+    return np.array(x)
