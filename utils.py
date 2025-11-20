@@ -38,3 +38,4 @@ def build_vocabulary(tweets, min_freq=5):
     print(f"📚 Vocabulaire construit:")
     print(f"   - Mots uniques total: {len(word_counter)}")
     print(f"   - Mots avec freq >= {min_freq}: {len(vocabulary)}")
+    return vocabulary, word_counter
