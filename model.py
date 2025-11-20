@@ -6,9 +6,6 @@ from sklearn.model_selection import train_test_split
 from os import path
 
 
-
-
-
 tweet_pos, tweet_neg, data_test = load_tweets("twitter-datasets/train_pos.txt","twitter-datasets/train_neg.txt", "twitter-datasets/test_data.txt")
 vocab_file = load_vocab("vocab_cut.txt")
 vocabulary_pos, word_counts_pos = build_vocabulary(tweet_pos, min_freq=5)
@@ -29,7 +26,7 @@ y_train_full = y_train
 X_train_split, X_val, y_train_split, y_val = train_test_split(
     X_train_full, y_train_full, test_size=0.2, random_state=42, stratify=y_train_full
 )
-    
+
 
 
 clf = LogisticRegression(max_iter=2000, n_jobs=-1)
