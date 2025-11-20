@@ -37,6 +37,22 @@ def load_txt_file(file_path: str):
     return file_data
 
 def load_tweets(train_pos_file, train_neg_file, test_file):
+    """Load positive, negative and test tweets from the relative file paths ``train_pos_file``, ``train_neg_file`` and ``test_file``.
+
+    Parameters
+    ----------
+    train_pos_file: str
+        The positive tweets relative file path.
+    train_neg_file: str
+        The negative tweets relative file path.
+    test_file: str
+        The test tweets relative file path.
+    
+    Returns
+    -------
+    pos_tweets, neg_tweets, test_tweets: tuple[list[str], list[str], list[str]]
+        A tuple of three lists of strings containing the lines of each file.
+    """
     pos_tweets, neg_tweets, test_tweets = [], [], []
     try : 
         pos_tweets = load_txt_file(train_pos_file)
@@ -48,11 +64,37 @@ def load_tweets(train_pos_file, train_neg_file, test_file):
     return pos_tweets, neg_tweets, test_tweets
 
 def load_vocab(vocab_file):
-    vocab = {idx : line for idx, line in enumerate(load_txt_file(vocab_file))}
+    """Load vocabulary words from the relative file path ``vocab_file``
+
+    Parameters
+    ----------
+    vocab_file: str
+        The vocabulary relative file path.
+
+    Returns
+    -------
+    vocab: dict[str, int]
+        A dictionnary of words with their corresponding line number in the file.
+    """
+    vocab = {line : idx for idx, line in enumerate(load_txt_file(vocab_file))}
     return vocab
 
 def build_vocabulary(tweets, min_freq=5):
- 
+    """Build a word vocabulary from a list of strings, optionally restricted to words with a minimum frequency of ``min_freq``.
+
+    Parameters
+    ----------
+    tweets: list of str
+        A list of tweets from which to extract words.
+    min-freq: int, default=5
+        minimum frequency a word has to have to be included in the vocabulary.
+
+    Returns
+    -------
+    vocabulary, word_counter: tuple[set, Counter]
+        Set of words included in the vocabulary, Counter object mapping each word in the tweets to it's frequency.
+    """
+
     word_counter = Counter()
     
     for tweet in tweets:
@@ -61,9 +103,9 @@ def build_vocabulary(tweets, min_freq=5):
     
     vocabulary = {word for word, count in word_counter.items() if count >= min_freq}
     
-    print(f"📚 Vocabulaire construit:")
-    print(f"   - Mots uniques total: {len(word_counter)}")
-    print(f"   - Mots avec freq >= {min_freq}: {len(vocabulary)}")
+    print(f"Vocabulary constructed:")
+    print(f"    Total unique words: {len(word_counter)}")
+    print(f"    Words with frequency >= {min_freq}: {len(vocabulary)}")
     return vocabulary, word_counter
 
 def vec_tweet(tweet, vocab, embeddings):
