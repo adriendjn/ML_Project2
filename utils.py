@@ -1,6 +1,7 @@
 from collections import Counter
 import numpy as np
 
+#### Potentiel ajout d'une fonction de nettoyage des tweets 
 
 def load_file(train_pos_file, train_neg_file, test_file):
     pos_tweets, neg_tweets, test_tweets = [], [], []
@@ -19,12 +20,14 @@ def load_file(train_pos_file, train_neg_file, test_file):
 
     try :
         with open(test_file, 'r', encoding='utf-8') as f3:
-            test_tweets = [line.strip() for line in f3 if line.strip()]
+            test_tweets = [line.strip().split(',', 1)[-1] for line in f3 if line.strip()]
         
     except FileNotFoundError:
         print(f" File {test_file} not found")
 
     return pos_tweets, neg_tweets, test_tweets
+
+# def 
 
 def load_vocab(vocab_file):
     vocab = {}
@@ -68,3 +71,4 @@ def tweets_to_features(tweets, vocab, embeddings):
     for tweet in tweets:
         x.append(vec_tweet(tweet, vocab, embeddings))
     return np.array(x)
+
