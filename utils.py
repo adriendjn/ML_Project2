@@ -109,6 +109,21 @@ def build_vocabulary(tweets, min_freq=5):
     return vocabulary, word_counter
 
 def vec_tweet(tweet, vocab, embeddings):
+    """Build the embedding vector for a tweet from each of its word.
+
+    Parameters
+    ----------
+    tweet: str
+        A tweet as a string.
+    vocab: dict str to int
+        The vocabulary mapping each word to its frequency.
+    embeddings: ndarray of float64
+        The embeddings for each word in the vocabulary.
+
+    Returns
+    -------
+    ndarray of float64
+    """
     vecs = [embeddings[vocab[w]] for w in tweet.split() if w in vocab]
 
     if vecs:
@@ -117,6 +132,21 @@ def vec_tweet(tweet, vocab, embeddings):
     
 
 def tweets_to_features(tweets, vocab, embeddings):
+    """Convert a list of tweets to a normalized feature representation.
+
+    Parameters
+    ----------
+    tweets: list of str
+        List of tweets to convert.
+    vocab: dict str to int
+        The vocabulary mapping each word to its frequency.
+    embeddings: ndarray of float64
+        The embeddings for each word in the vocabulary.
+
+    Returns
+    -------
+    ndarray of float64
+    """
     x = [vec_tweet(tweet, vocab, embeddings) for tweet in tweets]
     return np.array(x)
 
