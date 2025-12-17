@@ -1,16 +1,16 @@
 import numpy as np
-from ..utils import load_tweets, load_vocab, tweets_to_features, create_csv_submission
+from utils import load_tweets, load_vocab, tweets_to_features, create_csv_submission
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import normalize
 import random
 
 random.seed(42)
 
-TRAIN_POS_FILE = "train_pos.txt"
-TRAIN_NEG_FILE = "train_neg.txt"
-TEST_DATA_FILE = "test_data.txt"
-EMBEDDING_VOCAB_FILE = "vocab_cut.txt"
-EMBEDDING_FILE = "embeddings.npy"
+TRAIN_POS_FILE = "../twitter-datasets/train_pos.txt"
+TRAIN_NEG_FILE = "../twitter-datasets/train_neg.txt"
+TEST_DATA_FILE = "../twitter-datasets/test_data.txt"
+EMBEDDING_VOCAB_FILE = "../vocab_cut.txt"
+EMBEDDING_FILE = "../embeddings.npy"
 
 tweet_pos, tweet_neg, tweet_test = load_tweets(TRAIN_POS_FILE, TRAIN_NEG_FILE, TEST_DATA_FILE)
 
