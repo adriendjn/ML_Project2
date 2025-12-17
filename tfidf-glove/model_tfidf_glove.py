@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.metrics import f1_score, accuracy_score
-from utils import load_tweets, load_vocab, build_vocabulary, tweets_to_features, create_csv_submission
+from ..utils import load_tweets, load_vocab, build_vocabulary, tweets_to_features, create_csv_submission
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC
@@ -10,25 +10,26 @@ import random
 
 random.seed(42)
 
-train_pos = "../twitter-datasets/train_pos.txt"
-train_neg = "../twitter-datasets/train_neg.txt"
-final_test = "../twitter-datasets/test_data.txt"
-embedding_vocab_file = "../vocab_cut.txt"
-embedding_file = "../embeddings.npy"
+TRAIN_POS_FILE = "train_pos.txt"
+TRAIN_NEG_FILE = "train_neg.txt"
+TEST_DATA_FILE = "test_data.txt"
+EMBEDDING_VOCAB_FILE = "vocab_cut.txt"
+EMBEDDING_FILE = "embeddings.npy"
 
+tweet_pos, tweet_neg, tweet_test = load_tweets(TRAIN_POS_FILE, TRAIN_NEG_FILE, TEST_DATA_FILE)
 
-tweet_pos, tweet_neg, data_test = load_tweets(train_pos, train_neg, final_test)
-vocab_file = load_vocab("../vocab_cut.txt")
-data = np.load("../embeddings.npy")
+# Cleaning the index from every test tweets.
+embedding_vocab = load_vocab(EMBEDDING_VOCAB_FILE)
+embedding = np.load(EMBEDDING_FILE)
 
 
 vocabulary_pos, word_counts_pos = build_vocabulary(tweet_pos, min_freq=5)
 vocabulary_neg, word_counts_neg = build_vocabulary(tweet_neg, min_freq=5)
 
 
-list_vect_tweet_pos = tweets_to_features(tweet_pos, vocab_file, data)
-list_vect_tweet_neg = tweets_to_features(tweet_neg, vocab_file, data)
-list_vect_tweet_test = tweets_to_features(data_test, vocab_file, data)
+list_vect_tweet_pos = tweets_to_features(tweet_pos, embedding_vocab, embedding)
+list_vect_tweet_neg = tweets_to_features(tweet_neg, embedding_vocab, embedding)
+list_vect_tweet_test = tweets_to_features(tweet_test, embedding_vocab, embedding)
 
 
 X_embeddings = np.concatenate([list_vect_tweet_pos, list_vect_tweet_neg])
@@ -63,8 +64,8 @@ print("Validation F1-score:", f1)
 # Creating the submission
 
 X_test_embeddings_scaled = scaler.transform(list_vect_tweet_test)
-X_test_tfidf = vectorizer.transform(data_test)
+X_test_tfidf = vectorizer.transform(tweet_test)
 X_test = hstack([X_test_tfidf, X_test_embeddings_scaled])
 y_pred = clf.predict(X_test)
 ids = np.arange(1, len(y_pred)+1)
-create_csv_submission(ids, y_pred, "submissiontfidfglove.csv") 
+create_csv_submission(ids, y_pred, "../submissions/submissiontfidfglove.csv") 

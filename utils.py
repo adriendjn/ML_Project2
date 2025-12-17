@@ -55,9 +55,10 @@ def load_tweets(train_pos_file, train_neg_file, test_file):
     """
     pos_tweets, neg_tweets, test_tweets = [], [], []
     try : 
-        pos_tweets = load_txt_file(train_pos_file)
-        neg_tweets = load_txt_file(train_neg_file)
-        test_tweets = load_txt_file(test_file)
+        TWITTER_DATASET_PATH = "./twitter-datasets/"
+        pos_tweets = load_txt_file(TWITTER_DATASET_PATH + train_pos_file)
+        neg_tweets = load_txt_file(TWITTER_DATASET_PATH + train_neg_file)
+        test_tweets = load_txt_file(TWITTER_DATASET_PATH + test_file)
     except FileNotFoundError:
         print("Error with one or more files, empty data returned")
 
