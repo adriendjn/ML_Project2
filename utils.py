@@ -2,6 +2,7 @@ from collections import Counter
 from os import path
 import numpy as np
 import csv
+from sklearn.metrics import accuracy_score, f1_score
 
 #### Potentiel ajout d'une fonction de nettoyage des tweets 
 
