@@ -11,10 +11,10 @@ set_seed(42)
 torch.manual_seed(42)
 torch.cuda.manual_seed(42)
 
-
-tweet_pos = load_tweets("twitter-datasets/train_pos.txt")
-tweet_neg = load_tweets("twitter-datasets/train_neg.txt")
-tweet_test = load_tweets("twitter-datasets/test_data.txt")
+TRAIN_POS_FILE = "train_pos.txt"
+TRAIN_NEG_FILE = "train_neg.txt"
+TEST_DATA_FILE = "test_data.txt"
+tweet_pos, tweet_neg, tweet_test = load_tweets(TRAIN_POS_FILE, TRAIN_NEG_FILE, TEST_DATA_FILE)
 
 tweets = tweet_pos + tweet_neg
 labels = [1]*len(tweet_pos) + [0]*len(tweet_neg)

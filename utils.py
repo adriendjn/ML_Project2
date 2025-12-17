@@ -1,3 +1,6 @@
+from collections import Counter
+from os import path
+import numpy as np
 import csv
 
 #### Potentiel ajout d'une fonction de nettoyage des tweets 

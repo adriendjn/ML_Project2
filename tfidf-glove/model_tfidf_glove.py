@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.metrics import f1_score, accuracy_score
-from utils import load_tweets, load_vocab, build_vocabulary, tweets_to_features, create_csv_submission
+from utils_tf import load_tweets, load_vocab, build_vocabulary, tweets_to_features, create_csv_submission
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC
@@ -10,9 +10,11 @@ import random
 
 random.seed(42)
 
-TRAIN_POS_FILE = "../twitter-datasets/train_pos.txt"
-TRAIN_NEG_FILE = "../twitter-datasets/train_neg.txt"
-TEST_DATA_FILE = "../twitter-datasets/test_data.txt"
+TWITTER_DATASET_PATH = "../twitter-datasets/"
+
+TRAIN_POS_FILE = TWITTER_DATASET_PATH + "train_pos.txt"
+TRAIN_NEG_FILE = TWITTER_DATASET_PATH + "train_neg.txt"
+TEST_DATA_FILE = TWITTER_DATASET_PATH + "test_data.txt"
 EMBEDDING_VOCAB_FILE = "../vocab_cut.txt"
 EMBEDDING_FILE = "../embeddings.npy"
 
