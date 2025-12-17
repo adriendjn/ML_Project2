@@ -1,6 +1,3 @@
-from collections import Counter
-from os import path
-import numpy as np
 import csv
 
 #### Potentiel ajout d'une fonction de nettoyage des tweets 
@@ -166,10 +163,15 @@ def create_csv_submission(ids, y_pred, file_name):
     if not all(i in [-1, 1] for i in y_pred):
         raise ValueError("y_pred can only contain values -1, 1")
 
-    file_path = path.join(path.split(__file__)[0], path.normcase(file_name))
-    with open(file_path, "w", newline="") as csvfile:
+    with open(file_name, "w") as csv_file:
         fieldnames = ["Id", "Prediction"]
-        writer = csv.DictWriter(csvfile, delimiter=",", fieldnames=fieldnames)
+        writer = csv.DictWriter(csv_file, delimiter = ",", fieldnames=fieldnames)
         writer.writeheader()
-        for r1, r2 in zip(ids, y_pred):
-            writer.writerow({"Id": int(r1), "Prediction": int(r2)})
+        for i in range(len(ids)):
+            writer.writerow({"Id": int(ids[i]), "Prediction": int(y_pred[i])})
+
+def compute_metrics(pred):
+    labels = pred.label_ids
+    acc = accuracy_score(labels, pred.predictions.argmax(-1))
+    f1 = f1_score(labels, pred.predictions.argmax(-1))
+    return {"accuracy": acc, "f1": f1}
