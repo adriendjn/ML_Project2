@@ -27,7 +27,7 @@ Once you tested your system on the small set of 10% of all tweets, we suggest yo
 
 ## Building submissions for the baselines
 
-In order to run the scripts to build the predictions of the baseline, the scripts are made to be run from within the the folder `glove` or `tfidf-glove` and once you are inside of it run respectively `python model_glove.py` or `python model_tfidf_glove.py`
+In order to run the scripts to build the predictions of the baseline, the scripts are made to be run from within the folder `glove` or `tfidf-glove` and once you are inside of it run respectively `python model_glove.py` or `python model_tfidf_glove.py`
 
 ## Building the final submission
 
