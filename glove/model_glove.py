@@ -5,35 +5,37 @@ from sklearn.preprocessing import normalize
 import random
 
 random.seed(42)
-
+# Define where de datasets are
 TWITTER_DATASET_PATH = "../twitter-datasets/"
-
+# Define additionnal paths for embedding, vocabulary and datasets
 TRAIN_POS_FILE = TWITTER_DATASET_PATH + "train_pos.txt"
 TRAIN_NEG_FILE = TWITTER_DATASET_PATH + "train_neg.txt"
 TEST_DATA_FILE = TWITTER_DATASET_PATH + "test_data.txt"
 EMBEDDING_VOCAB_FILE = "../vocab_cut.txt"
 EMBEDDING_FILE = "../embeddings.npy"
-
+# Loading the data
 tweet_pos, tweet_neg, tweet_test = load_tweets(TRAIN_POS_FILE, TRAIN_NEG_FILE, TEST_DATA_FILE)
 
 # Cleaning the index from every test tweets.
 embedding_vocab = load_vocab(EMBEDDING_VOCAB_FILE)
 embedding = np.load(EMBEDDING_FILE)
 
-
+# Transforming the tweets using our embedding and vocab to construct features
 list_vect_tweet_pos = tweets_to_features(tweet_pos, embedding_vocab, embedding)
 list_vect_tweet_neg = tweets_to_features(tweet_neg, embedding_vocab, embedding)
 list_vect_tweet_test = tweets_to_features(tweet_test, embedding_vocab, embedding)
-
+# Constructing an array X_train and y_train combining the positive and negative vectors
 X_train = np.vstack([list_vect_tweet_pos, list_vect_tweet_neg])
 y_train = np.hstack([np.ones(len(list_vect_tweet_pos)), -np.ones(len(list_vect_tweet_neg))])
-
+# Normalize train and test sets
 X_train = normalize(X_train)
 list_vect_tweet_test = normalize(list_vect_tweet_test)
-
+# Logistic regresion + fitting of it
 clf = LogisticRegression(max_iter=1000)
 clf.fit(X_train, y_train)
-
+# Final prediction
 y_pred = clf.predict(list_vect_tweet_test)
+# Creating the ids array
 ids = np.arange(1, len(y_pred)+1)
+# Creating the submission file
 create_csv_submission(ids, y_pred, "../submissions/submissionGloveOnly.csv")
