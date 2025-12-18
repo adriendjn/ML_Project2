@@ -4,8 +4,6 @@ import numpy as np
 import csv
 from sklearn.metrics import accuracy_score, f1_score
 
-#### Potentiel ajout d'une fonction de nettoyage des tweets 
-
 def load_txt_file(file_path: str):
     """Load a text file's content from a relative path.
 
@@ -175,6 +173,11 @@ def create_csv_submission(ids, y_pred, file_name):
             writer.writerow({"Id": int(ids[i]), "Prediction": int(y_pred[i])})
 
 def compute_metrics(pred):
+    """
+    Docstring for compute_metrics
+    
+    :param pred: Description
+    """
     labels = pred.label_ids
     acc = accuracy_score(labels, pred.predictions.argmax(-1))
     f1 = f1_score(labels, pred.predictions.argmax(-1))
