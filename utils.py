@@ -3,6 +3,10 @@ from os import path
 import numpy as np
 import csv
 from sklearn.metrics import accuracy_score, f1_score
+from transformers.trainer_utils import PredictionOutput
+from constants import TRAIN_POS_FILE, TRAIN_NEG_FILE, TEST_DATA_FILE, EMBEDDING_VOCAB_FILE, SUBMISSIONS_PATH
+
+SEED = 42
 
 def load_txt_file(file_path: str):
     """Load a text file's content from a relative path.
@@ -35,16 +39,16 @@ def load_txt_file(file_path: str):
         raise 
     return file_data
 
-def load_tweets(train_pos_file, train_neg_file, test_file):
+def load_tweets(train_pos_file=TRAIN_POS_FILE, train_neg_file=TRAIN_NEG_FILE, test_file=TEST_DATA_FILE):
     """Load positive, negative and test tweets from the relative file paths ``train_pos_file``, ``train_neg_file`` and ``test_file``.
 
     Parameters
     ----------
-    train_pos_file: str
+    train_pos_file: str, default=constants.TRAIN_POS_FILE
         The positive tweets relative file path.
-    train_neg_file: str
+    train_neg_file: str, default=constants.TRAIN_NEG_FILE
         The negative tweets relative file path.
-    test_file: str
+    test_file: str, default=constants.TEST_DATA_FILE
         The test tweets relative file path.
     
     Returns
@@ -54,21 +58,20 @@ def load_tweets(train_pos_file, train_neg_file, test_file):
     """
     pos_tweets, neg_tweets, test_tweets = [], [], []
     try : 
-        TWITTER_DATASET_PATH = "./twitter-datasets/"
-        pos_tweets = load_txt_file(TWITTER_DATASET_PATH + train_pos_file)
-        neg_tweets = load_txt_file(TWITTER_DATASET_PATH + train_neg_file)
-        test_tweets = load_txt_file(TWITTER_DATASET_PATH + test_file)
+        pos_tweets = load_txt_file(train_pos_file)
+        neg_tweets = load_txt_file(train_neg_file)
+        test_tweets = load_txt_file(test_file)
     except FileNotFoundError:
         print("Error with one or more files, empty data returned")
 
     return pos_tweets, neg_tweets, test_tweets
 
-def load_vocab(vocab_file):
+def load_vocab(vocab_file=EMBEDDING_VOCAB_FILE):
     """Load vocabulary words from the relative file path ``vocab_file``
 
     Parameters
     ----------
-    vocab_file: str
+    vocab_file: str, default=constants.EMBEDDING_VOCAB_FILE
         The vocabulary relative file path.
 
     Returns
@@ -150,7 +153,7 @@ def tweets_to_features(tweets, vocab, embeddings):
     x = [vec_tweet(tweet, vocab, embeddings) for tweet in tweets]
     return np.array(x)
 
-def create_csv_submission(ids, y_pred, file_name):
+def create_csv_submission(ids, y_pred, file_name="submission.csv"):
     """
     This function creates a csv file named `file_name` in the format required for a submission in Kaggle or AIcrowd.
     The file will contain two columns the first with `ids` and the second with `y_pred`.
@@ -159,26 +162,33 @@ def create_csv_submission(ids, y_pred, file_name):
     Args:
         ids (list,np.array): indices
         y_pred (list,np.array): predictions on data correspondent to indices
-        name (str): name of the file to be created
+        name (str): name of the file to be created, default="submission.csv"
     """
     # Check that y_pred only contains -1 and 1
     if not all(i in [-1, 1] for i in y_pred):
         raise ValueError("y_pred can only contain values -1, 1")
 
-    with open(file_name, "w") as csv_file:
+    with open(path.join(SUBMISSIONS_PATH, file_name), "w", newline="") as csv_file:
         fieldnames = ["Id", "Prediction"]
         writer = csv.DictWriter(csv_file, delimiter = ",", fieldnames=fieldnames)
         writer.writeheader()
         for i in range(len(ids)):
             writer.writerow({"Id": int(ids[i]), "Prediction": int(y_pred[i])})
 
-def compute_metrics(pred):
-    """
-    Docstring for compute_metrics
+def compute_metrics(pred: PredictionOutput) -> dict[str, float]: 
+    """Compute the accuracy and F1 score metrics of the prediction.
     
-    :param pred: Description
+    Parameters
+    ----------
+    pred: PredictionOutput
+        The PredictionOutput object returned by Trainer.predict()
+
+    Returns
+    -------
+    dict[str, float]
+        A dict with the accuracy and the f1 score.
     """
     labels = pred.label_ids
-    acc = accuracy_score(labels, pred.predictions.argmax(-1))
-    f1 = f1_score(labels, pred.predictions.argmax(-1))
+    acc = accuracy_score(y_true=labels, y_pred=pred.predictions.argmax(-1))
+    f1 = f1_score(y_true=labels, y_pred=pred.predictions.argmax(-1))
     return {"accuracy": acc, "f1": f1}

@@ -1,27 +1,24 @@
 import numpy as np
 from sklearn.metrics import f1_score, accuracy_score
-from utils_tf import load_tweets, load_vocab, tweets_to_features, create_csv_submission
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(".")))
+from utils import load_tweets, load_vocab, tweets_to_features, create_csv_submission
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC
 from sklearn.preprocessing import MinMaxScaler
 from scipy.sparse import hstack
+from constants import SEED, EMBEDDING_FILE
 import random
 
-random.seed(42)
-# Define where de datasets are
-TWITTER_DATASET_PATH = "../twitter-datasets/"
-# Define additionnal paths for embedding, vocabulary and datasets
-TRAIN_POS_FILE = TWITTER_DATASET_PATH + "train_pos.txt"
-TRAIN_NEG_FILE = TWITTER_DATASET_PATH + "train_neg.txt"
-TEST_DATA_FILE = TWITTER_DATASET_PATH + "test_data.txt"
-EMBEDDING_VOCAB_FILE = "../vocab_cut.txt"
-EMBEDDING_FILE = "../embeddings.npy"
+random.seed(SEED)
+
 # Loading the data
-tweet_pos, tweet_neg, tweet_test = load_tweets(TRAIN_POS_FILE, TRAIN_NEG_FILE, TEST_DATA_FILE)
+tweet_pos, tweet_neg, tweet_test = load_tweets()
 
 # Cleaning the index from every test tweets.
-embedding_vocab = load_vocab(EMBEDDING_VOCAB_FILE)
+embedding_vocab = load_vocab()
 embedding = np.load(EMBEDDING_FILE)
 
 # Transforming the tweets using our embedding and vocab to construct features
@@ -45,7 +42,7 @@ X_tfidf = vectorizer.fit_transform(tweets)
 X_final = hstack([X_tfidf, X_embeddings_scaled])
 # Splitting the data for split validation
 X_train, X_val, y_train_split, y_val = train_test_split(
-    X_final, y, test_size=0.2, random_state=42, stratify=y
+    X_final, y, test_size=0.2, random_state=SEED, stratify=y
 )
 
 # Using linearSVC to make prediction
@@ -65,4 +62,4 @@ X_test_tfidf = vectorizer.transform(tweet_test)
 X_test = hstack([X_test_tfidf, X_test_embeddings_scaled])
 y_pred = clf.predict(X_test)
 ids = np.arange(1, len(y_pred)+1)
-create_csv_submission(ids, y_pred, "../submissions/submissiontfidfglove.csv") 
+create_csv_submission(ids, y_pred, "submission_tfidf-glove.csv") 
