@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.metrics import f1_score, accuracy_score
-from utils_tf import load_tweets, load_vocab, build_vocabulary, tweets_to_features, create_csv_submission
+from utils_tf import load_tweets, load_vocab, tweets_to_features, create_csv_submission
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC
@@ -9,62 +9,57 @@ from scipy.sparse import hstack
 import random
 
 random.seed(42)
-
+# Define where de datasets are
 TWITTER_DATASET_PATH = "../twitter-datasets/"
-
+# Define additionnal paths for embedding, vocabulary and datasets
 TRAIN_POS_FILE = TWITTER_DATASET_PATH + "train_pos.txt"
 TRAIN_NEG_FILE = TWITTER_DATASET_PATH + "train_neg.txt"
 TEST_DATA_FILE = TWITTER_DATASET_PATH + "test_data.txt"
 EMBEDDING_VOCAB_FILE = "../vocab_cut.txt"
 EMBEDDING_FILE = "../embeddings.npy"
-
+# Loading the data
 tweet_pos, tweet_neg, tweet_test = load_tweets(TRAIN_POS_FILE, TRAIN_NEG_FILE, TEST_DATA_FILE)
 
 # Cleaning the index from every test tweets.
 embedding_vocab = load_vocab(EMBEDDING_VOCAB_FILE)
 embedding = np.load(EMBEDDING_FILE)
 
-
-vocabulary_pos, word_counts_pos = build_vocabulary(tweet_pos, min_freq=5)
-vocabulary_neg, word_counts_neg = build_vocabulary(tweet_neg, min_freq=5)
-
-
+# Transforming the tweets using our embedding and vocab to construct features
 list_vect_tweet_pos = tweets_to_features(tweet_pos, embedding_vocab, embedding)
 list_vect_tweet_neg = tweets_to_features(tweet_neg, embedding_vocab, embedding)
 list_vect_tweet_test = tweets_to_features(tweet_test, embedding_vocab, embedding)
 
-
+# Creating the normalized embeddings array
 X_embeddings = np.concatenate([list_vect_tweet_pos, list_vect_tweet_neg])
 scaler = MinMaxScaler()
 X_embeddings_scaled = scaler.fit_transform(X_embeddings)
 
-
+# Creating the tweet array for tfidf
 tweets = tweet_pos + tweet_neg
 y = np.array([1]*len(tweet_pos) + [-1]*len(tweet_neg))
 
-
+# Making the tfidf array
 vectorizer = TfidfVectorizer(max_features=50000, ngram_range=(1,2))
 X_tfidf = vectorizer.fit_transform(tweets)
+# Making the combined X of tfidf and glove
 X_final = hstack([X_tfidf, X_embeddings_scaled])
+# Splitting the data for split validation
 X_train, X_val, y_train_split, y_val = train_test_split(
     X_final, y, test_size=0.2, random_state=42, stratify=y
 )
 
-
-
+# Using linearSVC to make prediction
 clf = LinearSVC()
 clf.fit(X_train, y_train_split)
 y_val_pred = clf.predict(X_val)
-
+# Computing the metrics on validation set
 acc = accuracy_score(y_val, y_val_pred)
 f1 = f1_score(y_val, y_val_pred)
-
 
 print("Validation Accuracy:", acc)
 print("Validation F1-score:", f1)
 
 # Creating the submission
-
 X_test_embeddings_scaled = scaler.transform(list_vect_tweet_test)
 X_test_tfidf = vectorizer.transform(tweet_test)
 X_test = hstack([X_test_tfidf, X_test_embeddings_scaled])
